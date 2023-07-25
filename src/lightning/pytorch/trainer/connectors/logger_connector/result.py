@@ -224,8 +224,9 @@ class _ResultMetric(Metric):
             # perform accumulation with reduction
             if self.meta.is_mean_reduction:
                 # do not use `+=` as it doesn't do type promotion
-                self.value = self.value + value * batch_size
-                self.cumulated_batch_size = self.cumulated_batch_size + batch_size
+                if not value.isnan(): #Project-specific addition, may write it properly for pull request later
+                    self.value = self.value + value.mean() * batch_size
+                    self.cumulated_batch_size = self.cumulated_batch_size + batch_size
             elif self.meta.is_max_reduction or self.meta.is_min_reduction:
                 self.value = self.meta.reduce_fx(self.value, value)
             elif self.meta.is_sum_reduction:
